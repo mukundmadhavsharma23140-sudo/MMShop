@@ -1,27 +1,22 @@
 import express from "express";
-import mongoose from "mongoose";
 import dotenv from "dotenv";
 import cors from "cors";
+import cookieParser from "cookie-parser";
+import connectDB from "./config/db.js";
+import userRoutes from "./routes/userRoutes.js";
 
 dotenv.config();
+connectDB();
 
 const app = express();
-
-// Middleware
-app.use(cors());
+app.use(cors({ origin: true, credentials: true })); // allow credentialed requests from your frontend origin
 app.use(express.json());
+app.use(cookieParser());
 
-// Test Route
-app.get("/", (req, res) => {
-  res.send("API is running...");
-});
+app.use("/api/users", userRoutes);
 
-// MongoDB Connection
-mongoose
-  .connect(process.env.MONGO_URI)
-  .then(() => console.log("✅ MongoDB Connected"))
-  .catch((err) => console.error("❌ MongoDB Error:", err));
+app.get("/", (req, res) => res.send("API is running..."));
 
-// Start Server
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => console.log(`🚀 Server running on port ${PORT}`));
+
